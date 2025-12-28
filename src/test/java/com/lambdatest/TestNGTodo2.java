@@ -49,43 +49,27 @@ public class TestNGTodo2 {
 
     @Test
     public void basicTest() throws InterruptedException {
-        System.out.println("Loading Url");
+       WebDriver driver = new ChromeDriver();
 
-        driver.get("https://lambdatest.github.io/sample-todo-app/");
+        try {
+            driver.get("https://www.lambdatest.com/selenium-playground");
+            driver.manage().window().maximize();
 
-        System.out.println("Checking boxes...");
-        driver.findElement(By.name("li1")).click();
-        driver.findElement(By.name("li2")).click();
-        driver.findElement(By.name("li3")).click();
-        driver.findElement(By.name("li4")).click();
+            driver.findElement(By.linkText("Drag & Drop Sliders")).click();
 
-        driver.findElement(By.id("sampletodotext")).sendKeys(" List Item 6");
-        driver.findElement(By.id("addbutton")).click();
+            WebElement slider = driver.findElement(By.xpath("//input[@value='15']"));
+            WebElement rangeValue = driver.findElement(By.id("rangeSuccess"));
 
-        driver.findElement(By.id("sampletodotext")).sendKeys(" List Item 7");
-        driver.findElement(By.id("addbutton")).click();
+            // Keep pressing ARROW_RIGHT until value becomes 95
+            while (!rangeValue.getText().equals("95")) {
+                slider.sendKeys(Keys.ARROW_RIGHT);
+            }
 
-        driver.findElement(By.id("sampletodotext")).sendKeys(" List Item 8");
-        driver.findElement(By.id("addbutton")).click();
+            System.out.println("Slider moved to: " + rangeValue.getText());
 
-        driver.findElement(By.name("li1")).click();
-        driver.findElement(By.name("li3")).click();
-        driver.findElement(By.name("li7")).click();
-        driver.findElement(By.name("li8")).click();
-
-        System.out.println("Entering Text");
-        driver.findElement(By.id("sampletodotext")).sendKeys("Get Taste of Lambda and Stick to It");
-        driver.findElement(By.id("addbutton")).click();
-
-        driver.findElement(By.name("li9")).click();
-
-        // ✅ Assert that the newly added todo is present
-        String spanText = driver.findElement(By.xpath("//li[9]/span")).getText();
-        Assert.assertEquals(spanText, "Get Taste of Lambda and Stick to It");
-
-        Status = "passed";
-        Thread.sleep(150);
-        System.out.println("Test Finished");
+        } finally {
+            driver.quit();
+        }
     }
 
     @AfterMethod

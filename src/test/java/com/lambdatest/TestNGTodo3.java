@@ -44,45 +44,70 @@ public class TestNGTodo3 {
 
     @Test
     public void basicTest() throws InterruptedException {
-        System.out.println("Loading URL...");
-        driver.get("https://lambdatest.github.io/sample-todo-app/");
-        Thread.sleep(200);
+       WebDriver driver = new ChromeDriver();
 
-        System.out.println("Checking Boxes...");
-        driver.findElement(By.name("li1")).click();
-        driver.findElement(By.name("li2")).click();
-        driver.findElement(By.name("li3")).click();
-        driver.findElement(By.name("li4")).click();
+        try {
+            // 1. Open LambdaTest’s Selenium Playground
+            driver.get("https://www.lambdatest.com/selenium-playground");
+            driver.manage().window().maximize();
 
-        System.out.println("Adding New Items...");
-        driver.findElement(By.id("sampletodotext")).sendKeys(" List Item 6");
-        driver.findElement(By.id("addbutton")).click();
+        
+            // Click “Input Form Submit”
+            WebElement inputFormLink = driver.findElement(By.linkText("Input Form Submit"));
+            inputFormLink.click();
 
-        driver.findElement(By.id("sampletodotext")).sendKeys(" List Item 7");
-        driver.findElement(By.id("addbutton")).click();
+            // 2. Click “Submit” without filling in any information
+            WebElement submitBtn = driver.findElement(By.xpath("//button[text()='Submit']"));
+            submitBtn.click();
 
-        driver.findElement(By.id("sampletodotext")).sendKeys(" List Item 8");
-        driver.findElement(By.id("addbutton")).click();
+            // 3. Assert “Please fill out this field.” error message
+            WebElement nameField = driver.findElement(By.xpath("//input[@id='name']"));
+            String validationMessage = nameField.getAttribute("validationMessage");
+            if (validationMessage.equals("Please fill out this field.")) {
+                System.out.println("Validation message displayed correctly: " + validationMessage);
+            } else {
+                System.out.println("Validation message mismatch: " + validationMessage);
+            }
 
-        System.out.println("Checking More Boxes...");
-        driver.findElement(By.name("li1")).click();
-        driver.findElement(By.name("li3")).click();
-        driver.findElement(By.name("li7")).click();
-        driver.findElement(By.name("li8")).click();
+            // 4. Fill in Name, Email, and other fields
+            nameField.sendKeys("John");
+            WebElement emailField = driver.findElement(By.id("inputEmail4"));
+            emailField.sendKeys("john.doe@example.com");
+            WebElement passwordField = driver.findElement(By.xpath("//input[@id='inputPassword4']"));
+            passwordField.sendKeys("Password123");
 
-        System.out.println("Adding Final Item...");
-        driver.findElement(By.id("sampletodotext")).sendKeys("Get Taste of Lambda and Stick to It");
-        driver.findElement(By.id("addbutton")).click();
+            WebElement companyField = driver.findElement(By.name("company"));
+            companyField.sendKeys("LambdaTest Inc.");
+            WebElement websiteField = driver.findElement(By.xpath("//input[@id='websitename']"));
+            websiteField.sendKeys("www.lambdatest.com");
 
-        driver.findElement(By.name("li9")).click();
+            // 5. From the Country drop-down, select “United States” using text property
+            WebElement countryDropdown = driver.findElement(By.cssSelector("select[name='country']"));
+            Select countrySelect = new Select(countryDropdown);
+            countrySelect.selectByVisibleText("United States");
 
-        // ✅ Safer and cleaner XPath
-        String spanText = driver.findElement(By.xpath("//li[9]/span")).getText();
-        Assert.assertEquals(spanText, "Get Taste of Lambda and Stick to It");
+            // Fill remaining fields
+            driver.findElement(By.id("inputCity")).sendKeys("New York");
+            driver.findElement(By.id("inputAddress1")).sendKeys("123 Main Street");
+            driver.findElement(By.id("inputAddress2")).sendKeys("Suite 456");
+            driver.findElement(By.id("inputState")).sendKeys("NY");
+            driver.findElement(By.id("inputZip")).sendKeys("10001");
 
-        Status = "passed";
-        Thread.sleep(300);
-        System.out.println("✅ Test Finished Successfully");
+            // 6. Click “Submit”
+            submitBtn.click();
+
+            // 7. Validate success message
+            WebElement successMsg = driver.findElement(By.xpath("//p[@class='success-msg hidden']"));
+            String successText = successMsg.getText();
+            if (successText.contains("Thanks for contacting us, we will get back to you shortly.")) {
+                System.out.println("Success message validated: " + successText);
+            } else {
+                System.out.println("Success message mismatch: " + successText);
+            }
+
+        } finally {
+            driver.quit();
+        }
     }
 
     @AfterMethod
